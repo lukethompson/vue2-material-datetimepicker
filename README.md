@@ -1,3 +1,5 @@
+![circleci](https://circleci.com/gh/lukethompson/vue2-material-datetimepicker.svg?style=shield)
+
 # vue2-material-datetimepicker
 Vue2 DateTime picker component. Currently under development and not ready for use.
 
