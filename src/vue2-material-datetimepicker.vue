@@ -9,7 +9,7 @@
           <div class="vmdtp-dialog-title">
             <span class="vmdtp-selected-year" @click="show('year')">{{ titleMoment.format('YYYY') }}</span>
             <span class="vmdtp-selected-date" @click="setDisplayMoment(titleMoment)">{{ titleMoment.format('dddd') }}, {{ titleMoment.format('MMM') }} {{ titleMoment.date() }}</span>
-            <span class="vmdtp-selected-time" @click="show('time')">{{ titleMoment.format('HH:MM') }}</span>
+            <span class="vmdtp-selected-time" @click="show('time')">{{ titleMoment.format('HH:mm') }}</span>
           </div>
         </div>
         <div class="vmdtp-dialog-content">
@@ -289,7 +289,6 @@
       setSelectedMoment(day) {
         this.displayMoment = day.moment
         this.selectedMoment = day.moment
-        this.show('time')
       },
       setYear(year) {
         this.setDisplayMoment(moment(this.displayMoment).set('year', year))
