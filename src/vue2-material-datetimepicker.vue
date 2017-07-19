@@ -9,6 +9,7 @@
           <div class="vmdtp-dialog-title">
             <span class="vmdtp-selected-year" @click="show('year')">{{ titleMoment.format('YYYY') }}</span>
             <span class="vmdtp-selected-date" @click="setDisplayMoment(titleMoment)">{{ titleMoment.format('dddd') }}, {{ titleMoment.format('MMM') }} {{ titleMoment.date() }}</span>
+            <span class="vmdtp-selected-time" @click="show('time')">{{ titleMoment.format('HH:MM') }}</span>
           </div>
         </div>
         <div class="vmdtp-dialog-content">
@@ -51,14 +52,14 @@
           </div>
           <div class="vmdtp-picker-container" v-if="showPicker.time">
             <div class="vmdtp-picker">
-              <div class="vmdtp-date-list vmdtp-hours">
+              <div class="vmdtp-date-list vmdtp-hours" ref="hourList">
                 <ul>
-                  <li v-for="hour in hours">{{ hour.value }}</li>
+                  <li class="hour" ref="hour" v-for="hour in hours" @click="setHour(hour.value)" :class="{'checked':hour.checked}">{{ hour.value }}</li>
                 </ul>
               </div>
-              <div class="vmdtp-date-list vmdtp-minutes">
+              <div class="vmdtp-date-list vmdtp-minutes" ref="minuteList">
                 <ul>
-                  <li v-for="minute in minutes">{{ minute.value }}</li>
+                  <li class="minute" ref="minute" v-for="minute in minutes" @click="setMinute(minute.value)" :class="{'checked':minute.checked}">{{ minute.value }}</li>
                 </ul>
               </div>
             </div>
@@ -87,39 +88,11 @@
       }
     },
     data() {
-      function getHours() {
-        let list = []
-        let hour = 0
-        while (hour < 24) {
-          list.push({
-            checked: false,
-            value: hour < 10 ? '0' + hour : hour
-          })
-          hour++
-        }
-
-        return list
-      }
-
-      function getMinutes() {
-        let list = []
-        let minute = 0
-        while (minute < 60) {
-          list.push({
-            checked: false,
-            value: minute < 10 ? '0' + minute : minute
-          })
-          minute++
-        }
-
-        return list
-      }
-
       return {
         days: null,
         displayMoment: null,
-        hours: getHours(),
-        minutes: getMinutes(),
+        hours: null,
+        minutes: null,
         months: null,
         selectedMoment: null,
         showPicker: {
@@ -140,6 +113,9 @@
       nextMonth () {
         this.displayMoment = moment(this.displayMoment).add(1, 'month')
       },
+      pad(value) {
+        return value < 10 ? '0' + value : value
+      },
       previousMonth () {
         this.displayMoment = moment(this.displayMoment).subtract(1, 'month')
       },
@@ -152,12 +128,13 @@
         this.date.time = this.selectedMoment
         this.close(true)
       },
-      scrollList(listRef, itemRef) {
-        let displayMoment = this.displayMoment
+      scrollList(items, selectedItem, listRef, itemRef) {
+        let selectedMoment = this.selectedMoment
         let listItemHeight = this.$refs[itemRef][0].offsetHeight
         let scrollTop = 0
-        this.years.map(function(year, index) {
-          if (year.value === moment(displayMoment).year())
+
+        items.map(function(item, index) {
+          if (item.value === selectedItem)
             scrollTop = listItemHeight * index
         })
 
@@ -220,9 +197,65 @@
 
         this.days = days
       },
+      setHour(hour) {
+        let newSelectedMoment = moment(this.selectedMoment).set('hour', hour)
+
+        this.displayMoment = newSelectedMoment
+        this.selectedMoment = newSelectedMoment
+        this.show('time')
+      },
+      setHours() {
+        let selectedMoment = this.selectedMoment
+
+        let list = []
+        let hour = 0
+        while (hour < 24) {
+          let display = this.pad(hour)
+          let data = {
+            checked: false,
+            display: display,
+            value: hour,
+          }
+          if (hour == moment(selectedMoment).hour())
+            data.checked = true
+
+          list.push(data)
+          hour++
+        }
+
+        this.hours = list
+      },
+      setMinute(minute) {
+        let newSelectedMoment = moment(this.selectedMoment).set('minute', minute)
+
+        this.displayMoment = newSelectedMoment
+        this.selectedMoment = newSelectedMoment
+        this.show('time')
+      },
+      setMinutes() {
+        let selectedMoment = this.selectedMoment
+
+        let list = []
+        let minute = 0
+        while (minute < 60) {
+          let display = this.pad(minute)
+          let data = {
+            checked: false,
+            display: display,
+            value: minute
+          }
+
+          if (minute == moment(selectedMoment).minute())
+            data.checked = true
+
+          list.push(data)
+          minute++
+        }
+
+        this.minutes = list
+      },
       setMonth(month) {
-        this.displayMoment = moment(this.displayMoment).set('month', month)
-        this.show('picker')
+        this.setDisplayMoment(moment(this.displayMoment).set('month', month))
       },
       setMonths() {
         let currentMoment = this.displayMoment
@@ -244,12 +277,12 @@
         this.months = list
       },
       setSelectedMoment(day) {
-        this.selectedMoment = day.moment
         this.displayMoment = day.moment
+        this.selectedMoment = day.moment
+        this.show('time')
       },
       setYear(year) {
-        this.displayMoment =  moment(this.displayMoment).set('year', year)
-        this.show('picker')
+        this.setDisplayMoment(moment(this.displayMoment).set('year', year))
       },
       setYears() {
         let currentMoment = this.displayMoment
@@ -297,7 +330,19 @@
             this.showPicker.time = false
 
             this.$nextTick(function() {
-              this.scrollList('monthList', 'month')
+              this.scrollList(this.months, moment(this.selectedMoment).month(), 'monthList', 'month')
+            })
+            break;
+
+          case 'time':
+            this.showPicker.day = false
+            this.showPicker.month = false
+            this.showPicker.picker = true
+            this.showPicker.year = false
+            this.showPicker.time = true
+            this.$nextTick(function() {
+              this.scrollList(this.hours, moment(this.selectedMoment).hour(), 'hourList', 'hour')
+              this.scrollList(this.minutes, moment(this.selectedMoment).minute(),'minuteList', 'minute')
             })
             break;
 
@@ -309,7 +354,7 @@
             this.showPicker.time = false
 
             this.$nextTick(function() {
-              this.scrollList('yearList', 'year')
+              this.scrollList(this.years, moment(this.selectedMoment).year(), 'yearList', 'year')
             })
             break;
           
@@ -350,6 +395,8 @@
     watch: {
       'displayMoment': function() {
         this.setDays()
+        this.setHours()
+        this.setMinutes()
         this.setMonths()
         this.setYears()
       }
@@ -372,16 +419,18 @@
     transform: translate(-50%, -50%);
   }
   .vmdtp-dialog-header { background: #3F51B5; color: #fff; height: 120px; text-align: center; }
-  .vmdtp-dialog-title { box-sizing: border-box; display: inline-block; font-size: 16px; height: 100%; padding: 30px 0; text-align: left; }
+  .vmdtp-dialog-title { box-sizing: border-box; display: inline-block; font-size: 16px; height: 100%; padding: 25px 0; text-align: left; }
   .vmdtp-dialog-content { box-sizing: border-box; width: 100%; }
   .vmdtp-dialog-footer { padding: 10px 25px 20px 25px; text-align: right; }
 
   .vmdtp-picker-container { box-sizing: border-box; height: 320px; overflow: hidden; }
-  .vmdtp-picker { height: 100%; }
-  .vmdtp-date-list { height: 100%; overflow-y: scroll; }
+  .vmdtp-picker { font-size: 0; height: 100%; }
+  .vmdtp-date-list { font-size: 16px; height: 100%; overflow-y: scroll; }
   .vmdtp-date-list ul { list-style: none; margin-top: 0; padding: 0; text-align: center; }
   .vmdtp-date-list ul li { cursor: pointer; padding: 10px 0; }
   .vmdtp-date-list ul li:hover { background: #e0e0e0; }
+  .vmdtp-date-list.vmdtp-hours { display: inline-block; width: 50%; }
+  .vmdtp-date-list.vmdtp-minutes { display: inline-block; width: 50%; }
 
   .vmdtp-btn { cursor: pointer; padding: 0 10px; }
   
@@ -420,11 +469,16 @@
   .vmdtp-day.checked:hover { background: #FF4F8E; }
   .vmdtp-day.passive { color: #bbb; }
   .vmdtp-day:hover { background: #eaeaea; }
+  .hour.checked { background: #F50057; color: #FFF !important; border-radius: 3px; }
+  .hour.checked:hover { background: #FF4F8E; }
+  .minute.checked { background: #F50057; color: #FFF !important; border-radius: 3px; }
+  .minute.checked:hover { background: #FF4F8E; }
   .month.checked { background: #F50057; color: #FFF !important; border-radius: 3px; }
   .month.checked:hover { background: #FF4F8E; }
   .year.checked { background: #F50057; color: #FFF !important; border-radius: 3px; }
   .year.checked:hover { background: #FF4F8E; }
   .vmdtp-selected-date { cursor: pointer; font-size: 28px; }
+  .vmdtp-selected-time { cursor: pointer; display: block; font-size: 14px; margin-top: 5px; text-align: right; }
   .vmdtp-selected-year { cursor: pointer; display: block; font-weight: 200; margin-bottom: 5px; }
   ::-webkit-scrollbar { width: 2px; }
   ::-webkit-scrollbar-track { background: #E3E3E3; }
