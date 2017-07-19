@@ -1,7 +1,7 @@
 <template>
   <div class="vmdtp-datepicker">
     <div class="vmdtp-input-container">
-      <input type="text" @click="show('picker')" @focus="show('picker')" :value="date.time.format('DD/MM/YYYY')" :title="option.inputTitle" class="vmdtp-input" readonly="readonly" />
+      <input type="text" @click="show('picker')" @focus="show('picker')" :value="savedMoment.format('YYYY-MM-DD HH:mm')" :title="option.inputTitle" class="vmdtp-input" readonly="readonly" />
     </div>
     <div class="vmdtp-overlay" v-if="showPicker.picker" @click="overlayClick($event)">
       <div class="vmdtp-dialog">
@@ -98,6 +98,7 @@
         minuteInputModel: null,
         minutes: null,
         months: null,
+        savedMoment: moment(this.date),
         selectedMoment: null,
         showPicker: {
           day: false,
@@ -129,7 +130,7 @@
         }
       },
       save () {
-        this.date.time = this.selectedMoment
+        this.savedMoment = moment(this.selectedMoment)
         this.close(true)
       },
       scrollList(items, selectedItem, listRef, itemRef, setSelected=false) {
@@ -173,7 +174,7 @@
             moment: moment(currentMoment).date(i + 1)
           })
 
-          if (days[i].moment.format('YYYY-MM-DD') === this.selectedMoment.format('YYYY-MM-DD'))
+          if (this.selectedMoment !== null && days[i].moment.format('YYYY-MM-DD') === this.selectedMoment.format('YYYY-MM-DD'))
             days[i].checked = true
         }
 
@@ -388,26 +389,29 @@
     props: {
       required: false,
       date: {
-        type: Object,
-        required: true
+        type: String,
+        required: false
       },
       option: {
         type: Object,
         default() {
           return {
-
+            default: moment()
           }
         }
       }
     },
     created: function() {
-      if (!(this.date.time instanceof moment)) {
-        this.date.time = moment(this.date.time)
-      }
+      this.defaultMoment = typeof this.date != 'undefined'
+        ? moment(this.date)
+        : moment(this.option.default)
 
       this.setWeekLabels()
-      this.displayMoment = this.date.time
-      this.selectedMoment = this.date.time
+      this.selectedMoment = typeof this.date != 'undefined'
+        ? moment(this.date)
+        : null
+
+      this.displayMoment = this.defaultMoment
     },
     watch: {
       'displayMoment': function() {

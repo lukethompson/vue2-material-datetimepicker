@@ -15,9 +15,7 @@ export default {
   },
   data() {
     return {
-      date: {
-        time: moment()
-      }
+      date: moment().format('YYYY-MM-DD')
     }
   }
 }
