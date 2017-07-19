@@ -115,11 +115,6 @@
         return list
       }
 
-      function getWeekLabels() {
-        let weekLabels = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su']
-        return weekLabels
-      }
-
       return {
         days: null,
         displayMoment: null,
@@ -135,7 +130,7 @@
           time: false
         },
         years: null,
-        weekLabels: getWeekLabels()
+        weekLabels: null
       }
     },
     methods: {
@@ -281,6 +276,9 @@
 
         this.years = list
       },
+      setWeekLabels() {
+        this.weekLabels = moment.weekdaysShort()
+      },
       show(type) {
         switch (type) {
           case 'picker':
@@ -345,6 +343,7 @@
         this.date.time = moment(this.date.time)
       }
 
+      this.setWeekLabels()
       this.displayMoment = this.date.time
       this.selectedMoment = this.date.time
     },
