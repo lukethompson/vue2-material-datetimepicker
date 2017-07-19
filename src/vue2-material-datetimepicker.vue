@@ -53,11 +53,13 @@
           <div class="vmdtp-picker-container" v-if="showPicker.time">
             <div class="vmdtp-picker">
               <div class="vmdtp-date-list vmdtp-hours" ref="hourList">
+                <input name="hour" type="number" ref="hourInput" v-model="hourInputModel" max="23" min="0" />
                 <ul>
                   <li class="hour" ref="hour" v-for="hour in hours" @click="setHour(hour.value)" :class="{'checked':hour.checked}">{{ hour.value }}</li>
                 </ul>
               </div>
               <div class="vmdtp-date-list vmdtp-minutes" ref="minuteList">
+                <input name="minute" type="number" ref="minuteInput" v-model="minuteInputModel" max="59" min="0" />
                 <ul>
                   <li class="minute" ref="minute" v-for="minute in minutes" @click="setMinute(minute.value)" :class="{'checked':minute.checked}">{{ minute.value }}</li>
                 </ul>
@@ -92,6 +94,8 @@
         days: null,
         displayMoment: null,
         hours: null,
+        hourInputModel: null,
+        minuteInputModel: null,
         minutes: null,
         months: null,
         selectedMoment: null,
@@ -128,14 +132,20 @@
         this.date.time = this.selectedMoment
         this.close(true)
       },
-      scrollList(items, selectedItem, listRef, itemRef) {
-        let selectedMoment = this.selectedMoment
+      scrollList(items, selectedItem, listRef, itemRef, setSelected=false) {
         let listItemHeight = this.$refs[itemRef][0].offsetHeight
         let scrollTop = 0
 
+        let that = this
         items.map(function(item, index) {
-          if (item.value === selectedItem)
+          if (item.value == selectedItem) {
             scrollTop = listItemHeight * index
+            if (setSelected == 'hour')
+              that.setHour(item.value)
+
+            if (setSelected == 'minute')
+              that.setMinute(item.value)
+          }
         })
 
         let listDOM = this.$refs
@@ -343,6 +353,14 @@
             this.$nextTick(function() {
               this.scrollList(this.hours, moment(this.selectedMoment).hour(), 'hourList', 'hour')
               this.scrollList(this.minutes, moment(this.selectedMoment).minute(),'minuteList', 'minute')
+
+              this.hourInputModel === null || this.hourInputModel.length < 2
+                ? this.$refs.hourInput.focus()
+                : this.$refs.minuteInput.focus()
+
+              if (this.minuteInputModel !== null && this.minuteInputModel.length >= 2)
+                this.$refs.minuteInput.blur()
+
             })
             break;
 
@@ -399,6 +417,18 @@
         this.setMinutes()
         this.setMonths()
         this.setYears()
+      },
+      'hourInputModel': function(value) {
+        if (value > 23)
+          this.hourInputModel = 23
+
+        this.scrollList(this.hours, this.hourInputModel, 'hourList', 'hour', 'hour')
+      },
+      'minuteInputModel': function(value) {
+        if (value > 59)
+          this.minuteInputModel = 59
+
+        this.scrollList(this.minutes, this.minuteInputModel, 'minuteList', 'minute', 'minute')
       }
     }
   }
@@ -426,6 +456,7 @@
   .vmdtp-picker-container { box-sizing: border-box; height: 320px; overflow: hidden; }
   .vmdtp-picker { font-size: 0; height: 100%; }
   .vmdtp-date-list { font-size: 16px; height: 100%; overflow-y: scroll; }
+  .vmdtp-date-list input { position: absolute; left: -9999px; }
   .vmdtp-date-list ul { list-style: none; margin-top: 0; padding: 0; text-align: center; }
   .vmdtp-date-list ul li { cursor: pointer; padding: 10px 0; }
   .vmdtp-date-list ul li:hover { background: #e0e0e0; }
