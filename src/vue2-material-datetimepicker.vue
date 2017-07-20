@@ -89,7 +89,7 @@
         return titleMoment
       }
     },
-    data() {
+    data () {
       return {
         days: null,
         displayMoment: null,
@@ -118,7 +118,7 @@
       getItemDisplayMoment (item) {
         return moment(this.displayMoment).set(item.type, item.value)
       },
-      isItemDisabled(item, limit) {
+      isItemDisabled (item, limit) {
         if (typeof item.moment == 'undefined')
           item.moment = this.getItemDisplayMoment(item)
 
@@ -142,7 +142,7 @@
       nextMonth () {
         this.displayMoment = moment(this.displayMoment).add(1, 'month')
       },
-      pad(value) {
+      pad (value) {
         return value < 10 ? '0' + value : value
       },
       previousMonth () {
@@ -157,12 +157,12 @@
         this.savedMoment = moment(this.selectedMoment)
         this.close(true)
       },
-      scrollList(items, selectedItem, listRef, itemRef, setSelected=false) {
+      scrollList (items, selectedItem, listRef, itemRef, setSelected=false) {
         let listItemHeight = this.$refs[itemRef][0].offsetHeight
         let scrollTop = 0
 
         let that = this
-        items.map(function(item, index) {
+        items.map(function (item, index) {
           if (item.value == selectedItem) {
             scrollTop = listItemHeight * index
             if (setSelected == 'hour')
@@ -176,11 +176,11 @@
         let listDOM = this.$refs
         listDOM[listRef].scrollTop = scrollTop
       },
-      setDisplayMoment(displayMoment) {
+      setDisplayMoment (displayMoment) {
         this.displayMoment = displayMoment
         this.show('picker')
       },
-      setDays() {
+      setDays () {
         let currentMoment = this.displayMoment
         let firstDay = moment(currentMoment).date(1).day()
         let previousMonth = moment(currentMoment).subtract(1, 'month')
@@ -238,14 +238,14 @@
 
         this.days = days
       },
-      setHour(hour) {
+      setHour (hour) {
         let newSelectedMoment = moment(this.selectedMoment).set('hour', hour)
 
         this.displayMoment = newSelectedMoment
         this.selectedMoment = newSelectedMoment
         this.show('time')
       },
-      setHours() {
+      setHours () {
         let selectedMoment = this.selectedMoment
 
         let list = []
@@ -274,14 +274,14 @@
 
         this.hours = list
       },
-      setMinute(minute) {
+      setMinute (minute) {
         let newSelectedMoment = moment(this.selectedMoment).set('minute', minute)
 
         this.displayMoment = newSelectedMoment
         this.selectedMoment = newSelectedMoment
         this.show('time')
       },
-      setMinutes() {
+      setMinutes () {
         let selectedMoment = this.selectedMoment
 
         let list = []
@@ -310,10 +310,10 @@
 
         this.minutes = list
       },
-      setMonth(month) {
+      setMonth (month) {
         this.setDisplayMoment(moment(this.displayMoment).set('month', month))
       },
-      setMonths() {
+      setMonths () {
         let currentMoment = this.displayMoment
         let selectedMoment = this.selectedMoment
 
@@ -339,17 +339,17 @@
 
         this.months = list
       },
-      setSelectedMoment(day) {
+      setSelectedMoment (day) {
         if (day.unavailable)
           return false
 
         this.displayMoment = day.moment
         this.selectedMoment = day.moment
       },
-      setYear(year) {
+      setYear (year) {
         this.setDisplayMoment(moment(this.displayMoment).set('year', year))
       },
-      setYears() {
+      setYears () {
         let currentMoment = this.displayMoment
         let selectedMoment = this.selectedMoment
 
@@ -381,10 +381,10 @@
 
         this.years = list
       },
-      setWeekLabels() {
+      setWeekLabels () {
         this.weekLabels = moment.weekdaysShort()
       },
-      show(type) {
+      show (type) {
         switch (type) {
           case 'picker':
             this.showPicker.day = true
@@ -464,7 +464,7 @@
         }
       }
     },
-    created: function() {
+    created: function () {
       this.defaultMoment = typeof this.date != 'undefined'
         ? moment(this.date)
         : moment(this.option.default)
@@ -477,20 +477,20 @@
       this.displayMoment = this.defaultMoment
     },
     watch: {
-      'displayMoment': function() {
+      'displayMoment': function () {
         this.setDays()
         this.setHours()
         this.setMinutes()
         this.setMonths()
         this.setYears()
       },
-      'hourInputModel': function(value) {
+      'hourInputModel': function (value) {
         if (value > 23)
           this.hourInputModel = 23
 
         this.scrollList(this.hours, this.hourInputModel, 'hourList', 'hour', 'hour')
       },
-      'minuteInputModel': function(value) {
+      'minuteInputModel': function (value) {
         if (value > 59)
           this.minuteInputModel = 59
 
