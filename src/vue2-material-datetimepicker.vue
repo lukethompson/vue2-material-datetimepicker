@@ -115,6 +115,24 @@
       close () {
         this.show('none')
       },
+      isItemDisabled(item, limit) {
+        switch (limit.type) {
+          case 'from':
+            return item.moment.isAfter(limit.date)
+
+          case 'to':
+            return item.moment.isBefore(limit.date)
+        }
+      },
+      limitItems (items, limit) {
+        items.map((item) => {
+          if (this.isItemDisabled(item, limit))
+            item.unavailable = true
+
+        })
+
+        return items
+      },
       nextMonth () {
         this.displayMoment = moment(this.displayMoment).add(1, 'month')
       },
@@ -206,6 +224,12 @@
           days.push(passiveDay)
         }
 
+        if (this.option.limit.length > 0) {
+          for (let limit of this.option.limit) {
+            days = this.limitItems(days, limit)
+          }
+        }
+
         this.days = days
       },
       setHour(hour) {
@@ -288,6 +312,9 @@
         this.months = list
       },
       setSelectedMoment(day) {
+        if (day.unavailable)
+          return false
+
         this.displayMoment = day.moment
         this.selectedMoment = day.moment
       },
@@ -396,7 +423,8 @@
         type: Object,
         default() {
           return {
-            default: moment()
+            default: moment(),
+            limit: []
           }
         }
       }
@@ -511,6 +539,7 @@
   .month.checked:hover { background: #FF4F8E; }
   .year.checked { background: #F50057; color: #FFF !important; border-radius: 3px; }
   .year.checked:hover { background: #FF4F8E; }
+  .unavailable { color: #ccc; cursor: not-allowed !important; }
   .vmdtp-selected-date { cursor: pointer; font-size: 28px; }
   .vmdtp-selected-time { cursor: pointer; display: block; font-size: 14px; margin-top: 5px; text-align: right; }
   .vmdtp-selected-year { cursor: pointer; display: block; font-weight: 200; margin-bottom: 5px; }

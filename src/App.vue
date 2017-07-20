@@ -1,6 +1,6 @@
 <template>
   <div>
-    <date-picker :date="date"></date-picker>
+    <date-picker :date="date" :option="option"></date-picker>
   </div>
 </template>
 
@@ -15,7 +15,19 @@ export default {
   },
   data() {
     return {
-      date: moment().format('YYYY-MM-DD')
+      date: moment().format('YYYY-MM-DD'),
+      option: {
+        limit: [
+          {
+            type: 'from',
+            date: moment().add(4, 'days').format('YYYY-MM-DD')
+          },
+          {
+            type: 'to',
+            date: moment().subtract(4, 'days').format('YYYY-MM-DD')
+          }
+        ]
+      }
     }
   }
 }
