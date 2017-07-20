@@ -98,7 +98,7 @@
         minuteInputModel: null,
         minutes: null,
         months: null,
-        isNextMonthDisabled: false,
+        nextMonthDisabled: false,
         previousMonthDisabled: false,
         savedMoment: moment(this.date),
         selectedMoment: null,
