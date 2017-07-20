@@ -17,7 +17,7 @@
             <div class="vmdtp-picker">
               <div class="vmdtp-date-list" ref="yearList">
                 <ul>
-                  <li class="year" v-for="(year,index) in years" :key="index" @click="setYear(year.value)" :class="{'checked':year.checked}" ref="year">{{ year.display }}</li>
+                  <li class="year" v-for="(year,index) in years" :key="index" @click="setYear(year.value)" :class="{'checked':year.checked,'unavailable':year.unavailable}" ref="year">{{ year.display }}</li>
                 </ul>
               </div>
             </div>
@@ -26,7 +26,7 @@
             <div class="vmdtp-picker">
               <div class="vmdtp-date-list" ref="monthList">
                 <ul>
-                  <li class="month" v-for="(month,index) in months" :key="index" @click="setMonth(month.value)" :class="{'checked':month.checked}" ref="month">{{ month.display }}</li>
+                  <li class="month" v-for="(month,index) in months" :key="index" @click="setMonth(month.value)" :class="{'checked':month.checked,'unavailable':month.unavailable}" ref="month">{{ month.display }}</li>
                 </ul>
               </div>
             </div>
@@ -55,13 +55,13 @@
               <div class="vmdtp-date-list vmdtp-hours" ref="hourList">
                 <input name="hour" type="number" ref="hourInput" v-model="hourInputModel" max="23" min="0" />
                 <ul>
-                  <li class="hour" ref="hour" v-for="hour in hours" @click="setHour(hour.value)" :class="{'checked':hour.checked}">{{ hour.value }}</li>
+                  <li class="hour" ref="hour" v-for="hour in hours" @click="setHour(hour.value)" :class="{'checked':hour.checked,'unavailable':hour.unavailable}">{{ hour.value }}</li>
                 </ul>
               </div>
               <div class="vmdtp-date-list vmdtp-minutes" ref="minuteList">
                 <input name="minute" type="number" ref="minuteInput" v-model="minuteInputModel" max="59" min="0" />
                 <ul>
-                  <li class="minute" ref="minute" v-for="minute in minutes" @click="setMinute(minute.value)" :class="{'checked':minute.checked}">{{ minute.value }}</li>
+                  <li class="minute" ref="minute" v-for="minute in minutes" @click="setMinute(minute.value)" :class="{'checked':minute.checked,'unavailable':minute.unavailable}">{{ minute.value }}</li>
                 </ul>
               </div>
             </div>
@@ -115,7 +115,13 @@
       close () {
         this.show('none')
       },
+      getItemDisplayMoment (item) {
+        return moment(this.displayMoment).set(item.type, item.value)
+      },
       isItemDisabled(item, limit) {
+        if (typeof item.moment == 'undefined')
+          item.moment = this.getItemDisplayMoment(item)
+
         switch (limit.type) {
           case 'from':
             return item.moment.isAfter(limit.date)
@@ -249,6 +255,8 @@
           let data = {
             checked: false,
             display: display,
+            type: 'hour',
+            unavailable: false,
             value: hour,
           }
           if (hour == moment(selectedMoment).hour())
@@ -256,6 +264,12 @@
 
           list.push(data)
           hour++
+        }
+
+        if (this.option.limit.length > 0) {
+          for (let limit of this.option.limit) {
+            list = this.limitItems(list, limit)
+          }
         }
 
         this.hours = list
@@ -277,6 +291,7 @@
           let data = {
             checked: false,
             display: display,
+            type: 'minute',
             value: minute
           }
 
@@ -285,6 +300,12 @@
 
           list.push(data)
           minute++
+        }
+
+        if (this.option.limit.length > 0) {
+          for (let limit of this.option.limit) {
+            list = this.limitItems(list, limit)
+          }
         }
 
         this.minutes = list
@@ -302,11 +323,18 @@
           list.push({
             checked: false,
             display: months[i],
+            type: 'month',
             value: i + 1
           })
 
           if (list[i].value == moment(selectedMoment).month())
             list[i].checked = true
+        }
+
+        if (this.option.limit.length > 0) {
+          for (let limit of this.option.limit) {
+            list = this.limitItems(list, limit)
+          }
         }
 
         this.months = list
@@ -334,6 +362,7 @@
           let data = {
             checked: false,
             display: year,
+            type: 'year',
             value: year
           }
 
@@ -342,6 +371,12 @@
 
           list.push(data)
           year++
+        }
+
+        if (this.option.limit.length > 0) {
+          for (let limit of this.option.limit) {
+            list = this.limitItems(list, limit)
+          }
         }
 
         this.years = list
