@@ -129,7 +129,7 @@
             return item.moment.isAfter(limit.date)
 
           case 'to':
-            return item.moment.isBefore(limit.date)
+            return item.moment.isBefore(limit.date, item.type)
         }
       },
       setPreviousMonthDisabled () {
