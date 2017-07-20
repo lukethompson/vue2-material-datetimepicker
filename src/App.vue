@@ -24,7 +24,7 @@ export default {
           },
           {
             type: 'to',
-            date: moment().subtract(4, 'days').format('YYYY-MM-DD HH:mm')
+            date: moment().subtract(1, 'days').format('YYYY-MM-DD HH:mm')
           }
         ]
       }
