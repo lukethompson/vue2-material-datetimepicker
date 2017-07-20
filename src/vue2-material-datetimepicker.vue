@@ -362,7 +362,7 @@
             checked: false,
             display: months[i],
             type: 'month',
-            value: i + 1
+            value: i
           })
 
           if (list[i].value == moment(selectedMoment).month())
