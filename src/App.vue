@@ -15,16 +15,16 @@ export default {
   },
   data() {
     return {
-      date: moment().format('YYYY-MM-DD'),
+      date: moment('2017-07-20 10:30').format('YYYY-MM-DD'),
       option: {
         limit: [
           {
             type: 'from',
-            date: moment().add(4, 'days').format('YYYY-MM-DD HH:mm')
+            date: moment('2017-07-20 10:30').add(4, 'days').format('YYYY-MM-DD HH:mm')
           },
           {
             type: 'to',
-            date: moment().subtract(1, 'days').format('YYYY-MM-DD HH:mm')
+            date: moment('2017-07-20 10:30').subtract(1, 'days').format('YYYY-MM-DD HH:mm')
           }
         ]
       }
