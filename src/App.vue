@@ -20,11 +20,11 @@ export default {
         limit: [
           {
             type: 'from',
-            date: moment().add(4, 'days').format('YYYY-MM-DD')
+            date: moment().add(4, 'days').format('YYYY-MM-DD HH:mm')
           },
           {
             type: 'to',
-            date: moment().subtract(4, 'days').format('YYYY-MM-DD')
+            date: moment().subtract(4, 'days').format('YYYY-MM-DD HH:mm')
           }
         ]
       }
