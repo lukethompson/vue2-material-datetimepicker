@@ -33,11 +33,11 @@
           </div>
           <div class="vmdtp-picker-container" v-if="showPicker.day">
             <div class="vmdtp-month-selection">
-              <div class="vmdtp-previous" @click="previousMonth()">«</div>
+              <div class="vmdtp-previous" @click="previousMonth()" :class="{'unavailable':previousMonthDisabled}">«</div>
               <div class="vmdtp-month-selection-month" @click="show('month')">
                 {{ displayMoment.format('MMM') + ' ' + displayMoment.format('YYYY') }}
               </div>
-              <div class="vmdtp-next" @click="nextMonth()">»</div>
+              <div class="vmdtp-next" @click="nextMonth()" :class="{'unavailable':nextMonthDisabled}">»</div>
             </div>
             <div class="vmdtp-datepicker">
               <div class="vmdtp-weekday-labels">
@@ -98,6 +98,8 @@
         minuteInputModel: null,
         minutes: null,
         months: null,
+        isNextMonthDisabled: false,
+        previousMonthDisabled: false,
         savedMoment: moment(this.date),
         selectedMoment: null,
         showPicker: {
@@ -130,6 +132,36 @@
             return item.moment.isBefore(limit.date)
         }
       },
+      setPreviousMonthDisabled () {
+        let previousMonth = {
+          moment: moment(this.displayMoment).subtract(1, 'month'),
+          type: 'month'
+        }
+
+        if (this.option.limit.length > 0) {
+          for (let limit of this.option.limit) {
+            if (limit.type !== 'to')
+              continue
+
+            this.previousMonthDisabled = this.isItemDisabled(previousMonth, limit)
+          }
+        }
+      },
+      setNextMonthDisabled () {
+        let nextMonth = {
+          moment: moment(this.displayMoment).add(1, 'month'),
+          type: 'month'
+        }
+
+        if (this.option.limit.length > 0) {
+          for (let limit of this.option.limit) {
+            if (limit.type !== 'from')
+              continue
+
+            this.nextMonthDisabled = this.isItemDisabled(nextMonth, limit)
+          }
+        }
+      },
       limitItems (items, limit) {
         items.map((item) => {
           if (this.isItemDisabled(item, limit))
@@ -140,12 +172,18 @@
         return items
       },
       nextMonth () {
+        if (this.nextMonthDisabled)
+          return false
+
         this.displayMoment = moment(this.displayMoment).add(1, 'month')
       },
       pad (value) {
         return value < 10 ? '0' + value : value
       },
       previousMonth () {
+        if (this.previousMonthDisabled)
+          return false
+
         this.displayMoment = moment(this.displayMoment).subtract(1, 'month')
       },
       overlayClick (event) {
@@ -478,6 +516,9 @@
     },
     watch: {
       'displayMoment': function () {
+        this.setNextMonthDisabled()
+        this.setPreviousMonthDisabled()
+
         this.setDays()
         this.setHours()
         this.setMinutes()
