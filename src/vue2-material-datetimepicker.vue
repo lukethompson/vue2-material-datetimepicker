@@ -233,7 +233,8 @@
             inMonth: true,
             unavailable: false,
             checked: false,
-            moment: moment(currentMoment).date(i + 1)
+            moment: moment(currentMoment).set('date', i + 1),
+            type: 'day'
           })
 
           if (this.selectedMoment !== null && days[i].moment.format('YYYY-MM-DD') === this.selectedMoment.format('YYYY-MM-DD'))
@@ -250,7 +251,8 @@
             action: 'previous',
             unavailable: false,
             checked: false,
-            moment: moment(currentMoment).date(1).subtract(i + 1, 'days')
+            moment: moment(currentMoment).set('date', 1).subtract(i + 1, 'days'),
+            type: 'day'
           }
           days.unshift(passiveDay)
         }
@@ -263,7 +265,8 @@
             action: 'next',
             unavailable: false,
             checked: false,
-            moment: moment(nextMonth).add(1, 'months').date(i + 1)
+            moment: moment(nextMonth).set('date', i + 1).add(1, 'months'),
+            type: 'day'
           }
           days.push(passiveDay)
         }
