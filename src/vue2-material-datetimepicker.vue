@@ -578,9 +578,9 @@
   
   .vmdtp-datepicker { padding: 0 25px; }
   
-  .vmdtp-month-selection { font-size: 0; height: 30px; line-height: 30px; margin: 25px 0; padding: 0 12px; }
+  .vmdtp-month-selection { display: flex; height: 30px; line-height: 30px; margin: 25px 0; padding: 0 12px; }
   .vmdtp-previous,
-  .vmdtp-next { color: #fff; display: inline-block; cursor: pointer; height: 100%; overflow: hidden; position: relative; text-indent: -300px; width: 15% !important; }
+  .vmdtp-next { color: #fff; display: inline-block; cursor: pointer; flex: 1 15%; height: 100%; overflow: hidden; position: relative; text-indent: -300px; }
   .vmdtp-previous:after,
   .vmdtp-next:after { background: #000; content: ''; height: 2px; position: absolute; line-height: 0; margin-top: 6px; right: 0; text-align: center; top: 50%; width: 20px;
     -webkit-transform: rotate(-45deg);
@@ -593,7 +593,7 @@
     -moz-transform: rotate(45deg);
     transform: rotate(45deg);
   }
-  .vmdtp-month-selection-month { cursor: pointer; display: inline-block; font-size: 18px; text-align: center; vertical-align: top; width: 70%; }
+  .vmdtp-month-selection-month { cursor: pointer; display: inline-block; flex: 1 70%; font-size: 18px; text-align: center; vertical-align: top; }
   .vmdtp-previous::after { left: 0; right: auto;
     -webkit-transform: rotate(45deg);
     -moz-transform: rotate(45deg);
