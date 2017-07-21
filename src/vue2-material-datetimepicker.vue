@@ -1,7 +1,7 @@
 <template>
   <div class="vmdtp-datepicker">
     <div class="vmdtp-input-container">
-      <input type="text" @click="show('picker')" @focus="show('picker')" :value="savedMoment.format('YYYY-MM-DD HH:mm')" :title="option.inputTitle" class="vmdtp-input" readonly="readonly" />
+      <input type="text" @click="show('picker')" @focus="show('picker')" :value="savedMoment.format('YYYY-MM-DD HH:mm')" :title="option.inputTitle" :class="option.inputClass ? option.inputClass : {}" class="vmdtp-input" readonly="readonly" />
     </div>
     <div class="vmdtp-overlay" v-if="showPicker.picker" @click="overlayClick($event)">
       <div class="vmdtp-dialog">
@@ -500,6 +500,7 @@
         default() {
           return {
             default: moment(),
+            inputClass: null,
             limit: []
           }
         }
